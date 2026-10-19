@@ -14,6 +14,11 @@ public class LogDbContext : DbContext, IApplicationDbContext
     public DbSet<LogEntry> Logs => Set<LogEntry>();
     public DbSet<LogEventType> LogEventTypes => Set<LogEventType>();
 
+    public DbSet<CentralAuditLog> CentralAuditLogs => Set<CentralAuditLog>();
+    public DbSet<AuditSyncBatch> AuditSyncBatches => Set<AuditSyncBatch>();
+    public DbSet<AppLogFileCatalog> AppLogFileCatalogs => Set<AppLogFileCatalog>();
+    public DbSet<SecurityAuditAlert> SecurityAuditAlerts => Set<SecurityAuditAlert>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -24,5 +29,12 @@ public class LogDbContext : DbContext, IApplicationDbContext
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();
+    }
+}
+
+public class AppDbContext : LogDbContext
+{
+    public AppDbContext(DbContextOptions<LogDbContext> options) : base(options)
+    {
     }
 }
