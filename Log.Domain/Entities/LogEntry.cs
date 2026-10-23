@@ -1,8 +1,8 @@
 namespace Log.Domain.Entities;
 
-using global::Log.Domain.Common;
+using Log.Domain.Base;
 
-public class LogEntry : BaseEntity
+public class LogEntry : BaseEntity<Guid>
 {
     public DateTimeOffset OccurredAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset RecordedAt { get; set; } = DateTimeOffset.UtcNow;

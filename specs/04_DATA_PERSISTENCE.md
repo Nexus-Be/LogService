@@ -36,8 +36,8 @@
 
 ## 2. QUY CHUẨN POSTGRESQL & INDEXES
 
-- Database: `log_db` tại port `5435`.
-- Chuỗi kết nối: `Host=localhost;Port=5435;Database=log_db;Username=postgres;Password=postgres`.
+- Database: `log_db` tại port `5436`.
+- Chuỗi kết nối: `Host=localhost;Port=5436;Database=log_db;Username=postgres;Password=MatkhaucuaTui123@`.
 - Bảng chính: `logs`, `log_event_types`.
 - Indexes bắt buộc:
   - `ix_logs_occurred_at`: B-Tree Index trên `occurred_at DESC` phục vụ sắp xếp thời gian.

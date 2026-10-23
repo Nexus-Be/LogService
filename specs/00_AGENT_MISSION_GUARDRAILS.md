@@ -23,12 +23,12 @@
    - Không được tạo `ILogRepository`, `UnitOfWork`.
 
 3. **CÔ LẬP TUYỆT ĐỐI DỮ LIỆU & RANH GIỚI MIỀN (DATABASE-PER-SERVICE)**:
-   - `LogService` chỉ sở hữu cơ sở dữ liệu `log_db` trên port `5435`.
+   - `LogService` chỉ sở hữu cơ sở dữ liệu `log_db` trên port `5436`.
    - Mọi dữ liệu từ service khác đưa vào log thông qua RabbitMQ message payload (`Payload` dạng jsonb) hoặc gRPC call.
 
-4. **TUYỆT ĐỐI KHÔNG THAY ĐỔI CỔNG 8004 VÀ DATABASE 5435**:
+4. **TUYỆT ĐỐI KHÔNG THAY ĐỔI CỔNG 8004 VÀ DATABASE 5436**:
    - Service gRPC chạy tại `http://localhost:8004`.
-   - Chuỗi kết nối DB trỏ tới `localhost:5435/log_db`.
+   - Chuỗi kết nối DB trỏ tới `localhost:5436/log_db` với mật khẩu mặc định `MatkhaucuaTui123@`.
 
 5. **TUYỆT ĐỐI KHÔNG TỰ Ý SỬA PROTOBUF MÀ KHÔNG ĐỒNG BỘ GATEWAY**:
    - RPC methods và message formats phải khớp 100% với `Contracts/shop.proto` tại ApiGateway (`LogApi`).

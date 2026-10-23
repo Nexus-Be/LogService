@@ -13,7 +13,7 @@ public static class InfrastructureDependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection") 
-            ?? "Host=localhost;Port=5435;Database=log_db;Username=postgres;Password=postgres";
+            ?? "Host=localhost;Port=5436;Database=log_db;Username=postgres;Password=MatkhaucuaTui123@";
 
         services.AddDbContext<LogDbContext>(options =>
         {
@@ -44,7 +44,7 @@ public static class InfrastructureDependencyInjection
                 var rabbitHost = configuration["RabbitMq:Host"] ?? "localhost";
                 var rabbitPort = ushort.TryParse(configuration["RabbitMq:Port"], out var port) ? port : (ushort)5672;
                 var rabbitUser = configuration["RabbitMq:User"] ?? "guest";
-                var rabbitPass = configuration["RabbitMq:Password"] ?? "guest";
+                var rabbitPass = configuration["RabbitMq:Password"] ?? "MatkhaucuaTui123@";
 
                 cfg.Host(rabbitHost, rabbitPort, "/", h =>
                 {

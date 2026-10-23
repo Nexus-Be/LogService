@@ -8,7 +8,7 @@ Tài liệu này là **Bộ Chỉ Dẫn & Đặc Tả Kỹ Thuật (Spec Kit)** 
 
 | File Đặc Tả | Trọng Tâm Nội Dung |
 |:---|:---|
-| [00_AGENT_MISSION_GUARDRAILS.md](00_AGENT_MISSION_GUARDRAILS.md) | Bounded Context, Port `8004`, DB `log_db` (`5435`), tính bất biến của log (Append-Only). |
+| [00_AGENT_MISSION_GUARDRAILS.md](00_AGENT_MISSION_GUARDRAILS.md) | Bounded Context, Port `8004`, DB `log_db` (`5436`), tính bất biến của log (Append-Only). |
 | [01_CLEAN_ARCHITECTURE_LAYERS.md](01_CLEAN_ARCHITECTURE_LAYERS.md) | Cấu trúc 4 tầng Clean Architecture (`.Api`, `.Application`, `.Domain`, `.Infrastructure`), luồng phụ thuộc. |
 | [02_API_GRPC_CONTRACTS.md](02_API_GRPC_CONTRACTS.md) | Hợp đồng gRPC `LogApi` trong `shop.proto`, tra cứu logs, bật/tắt event type. |
 | [03_EVENT_MESSAGING.md](03_EVENT_MESSAGING.md) | Người lắng nghe toàn sàn qua RabbitMQ + MassTransit 8.4.1 để ghi nhận system logs. |
@@ -21,6 +21,6 @@ Tài liệu này là **Bộ Chỉ Dẫn & Đặc Tả Kỹ Thuật (Spec Kit)** 
 
 - **Ngôn ngữ & Runtime**: .NET 8 (C# 12).
 - **Cổng gRPC Server**: Port `8004` (Không có cổng HTTP REST riêng, mọi REST call đều qua ApiGateway Port `8000`).
-- **Cơ Sở Dữ Liệu**: PostgreSQL (Port `5435`, Database: `log_db`).
+- **Cơ Sở Dữ Liệu**: PostgreSQL (Port `5436`, Database: `log_db`, Mật khẩu: `MatkhaucuaTui123@`).
 - **Message Broker**: RabbitMQ (Port `5672`, Virtual Host: `/`).
 - **Nguyên Tắc Bất Biến (Immutability)**: Bảng `LogEntry` chỉ được phép `INSERT` và `SELECT`. Tuyệt đối cấm thao tác `UPDATE` hoặc `DELETE`.

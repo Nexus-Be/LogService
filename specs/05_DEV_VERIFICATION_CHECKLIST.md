@@ -22,6 +22,6 @@ dotnet run --project Log.Api
 
 - [ ] **Biên dịch thành công 100%**: Không lỗi cảnh báo nghiêm trọng.
 - [ ] **Tính bất biến (Append-Only)**: Không có hàm hoặc endpoint nào cho phép UPDATE hay DELETE `LogEntry`.
-- [ ] **Port & Database**: Lắng nghe đúng port `8004`, kết nối `log_db` trên port `5435`.
+- [ ] **Port & Database**: Lắng nghe đúng port `8004`, kết nối `log_db` trên port `5436` (Password: `MatkhaucuaTui123@`).
 - [ ] **No-Repository Pattern**: Tương tác trực tiếp qua DbContext / DbSet.
 - [ ] **Git Status**: Không commit file rác (`bin/`, `obj/`, `.idea/`, `.env`).
