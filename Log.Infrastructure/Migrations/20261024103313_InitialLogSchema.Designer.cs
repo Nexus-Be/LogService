@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Log.Infrastructure.Migrations
 {
     [DbContext(typeof(LogDbContext))]
-    [Migration("20261024080751_InitialLogSchema")]
+    [Migration("20261024103313_InitialLogSchema")]
     partial class InitialLogSchema
     {
         /// <inheritdoc />
@@ -215,6 +215,46 @@ namespace Log.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CentralAuditLogs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("90000000-0000-0000-0000-000000000001"),
+                            Action = "Approve",
+                            ChangedColumns = "[\"Status\"]",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            EntityId = "cccccccc-3333-3333-3333-333333333334",
+                            EntityName = "SellerProfile",
+                            IpAddress = "127.0.0.1",
+                            IsDeleted = false,
+                            NewValues = "{\"status\":\"Approved\"}",
+                            OldValues = "{\"status\":\"Pending\"}",
+                            ServiceName = "User",
+                            SyncedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            TraceId = "trace-user-approve-seller-001",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserAgent = "NexusAdminPortal/1.0",
+                            UserId = "aaaaaaaa-1111-1111-1111-111111111111",
+                            UserName = "admin@nexus.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("90000000-0000-0000-0000-000000000002"),
+                            Action = "Create",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            EntityId = "02000000-0000-0000-0000-000000000001",
+                            EntityName = "SubOrder",
+                            IpAddress = "127.0.0.1",
+                            IsDeleted = false,
+                            NewValues = "{\"subOrderNo\":\"SUB-20260101-0001\",\"totalAmount\":850000}",
+                            ServiceName = "Commerce",
+                            SyncedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            TraceId = "trace-order-paid-001",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserAgent = "NexusApp/1.0",
+                            UserId = "dddddddd-4444-4444-4444-444444444444",
+                            UserName = "buyer@nexus.com"
+                        });
                 });
 
             modelBuilder.Entity("Log.Domain.Entities.LogEntry", b =>
@@ -351,6 +391,58 @@ namespace Log.Infrastructure.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("LogEventTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "USER_REGISTER",
+                            Category = "Authentication",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Đăng ký tài khoản người dùng mới",
+                            IsEnabled = true,
+                            ServiceName = "User",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Code = "SELLER_APPROVE",
+                            Category = "Onboarding",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Phê duyệt hồ sơ người bán hàng",
+                            IsEnabled = true,
+                            ServiceName = "User",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Code = "ORDER_PAID",
+                            Category = "Order",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Thanh toán đơn hàng thành công qua ví điện tử",
+                            IsEnabled = true,
+                            ServiceName = "Commerce",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Code = "AUCTION_BID",
+                            Category = "Auction",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Khách hàng đặt giá thầu trong phiên đấu giá",
+                            IsEnabled = true,
+                            ServiceName = "Auction",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Code = "SHIPMENT_DELIVERED",
+                            Category = "Shipment",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Giao hàng thành công tới người mua",
+                            IsEnabled = true,
+                            ServiceName = "Fulfillment",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
                 });
 
             modelBuilder.Entity("Log.Domain.Entities.SecurityAuditAlert", b =>

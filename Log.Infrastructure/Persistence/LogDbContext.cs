@@ -24,6 +24,7 @@ public class LogDbContext : DbContext, IApplicationDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LogDbContext).Assembly);
+        Seeds.LogSeedData.SeedAll(modelBuilder);
 
         // MassTransit Transactional Outbox entities
         modelBuilder.AddInboxStateEntity();

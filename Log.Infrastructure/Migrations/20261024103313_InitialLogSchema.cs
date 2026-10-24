@@ -4,6 +4,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Log.Infrastructure.Migrations
 {
     /// <inheritdoc />
@@ -248,6 +250,27 @@ namespace Log.Infrastructure.Migrations
                         column: x => x.OutboxId,
                         principalTable: "OutboxState",
                         principalColumn: "OutboxId");
+                });
+
+            migrationBuilder.InsertData(
+                table: "CentralAuditLogs",
+                columns: new[] { "Id", "Action", "ChangedColumns", "CreatedAt", "DeletedAt", "EntityId", "EntityName", "IpAddress", "IsDeleted", "NewValues", "OldValues", "ServiceName", "SyncedAt", "TraceId", "UpdatedAt", "UserAgent", "UserId", "UserName" },
+                values: new object[,]
+                {
+                    { new Guid("90000000-0000-0000-0000-000000000001"), "Approve", "[\"Status\"]", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "cccccccc-3333-3333-3333-333333333334", "SellerProfile", "127.0.0.1", false, "{\"status\":\"Approved\"}", "{\"status\":\"Pending\"}", "User", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "trace-user-approve-seller-001", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "NexusAdminPortal/1.0", "aaaaaaaa-1111-1111-1111-111111111111", "admin@nexus.com" },
+                    { new Guid("90000000-0000-0000-0000-000000000002"), "Create", null, new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "02000000-0000-0000-0000-000000000001", "SubOrder", "127.0.0.1", false, "{\"subOrderNo\":\"SUB-20260101-0001\",\"totalAmount\":850000}", null, "Commerce", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "trace-order-paid-001", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "NexusApp/1.0", "dddddddd-4444-4444-4444-444444444444", "buyer@nexus.com" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "LogEventTypes",
+                columns: new[] { "Code", "Category", "CreatedAt", "Description", "IsEnabled", "ServiceName", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { "AUCTION_BID", "Auction", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Khách hàng đặt giá thầu trong phiên đấu giá", true, "Auction", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { "ORDER_PAID", "Order", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Thanh toán đơn hàng thành công qua ví điện tử", true, "Commerce", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { "SELLER_APPROVE", "Onboarding", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Phê duyệt hồ sơ người bán hàng", true, "User", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { "SHIPMENT_DELIVERED", "Shipment", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Giao hàng thành công tới người mua", true, "Fulfillment", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { "USER_REGISTER", "Authentication", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "Đăng ký tài khoản người dùng mới", true, "User", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
                 });
 
             migrationBuilder.CreateIndex(
