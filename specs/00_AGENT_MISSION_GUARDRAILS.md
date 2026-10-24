@@ -18,7 +18,7 @@
    - Nhật ký mang tính pháp lý, bảo mật và chẩn đoán sự cố. Bảng `LogEntry` chỉ được phép thêm mới (`INSERT`) và đọc (`SELECT`). Tuyệt đối **KHÔNG CÓ API SỬA HOẶC XÓA LOG**.
 
 2. **TUYỆT ĐỐI KHÔNG DÙNG REPOSITORY PATTERN BỌC NGOÀI EF CORE**:
-   - Tuân thủ quyết định kiến trúc [ADR 05](../../../docs/adr/ADR.md).
+   - Tuân thủ nguyên tắc kiến trúc hệ thống: Không sử dụng Repository Pattern bọc ngoài EF Core.
    - Sử dụng trực tiếp `LogDbContext` và `DbSet<T>` (hoặc interface `IApplicationDbContext`) trong tầng Application.
    - Không được tạo `ILogRepository`, `UnitOfWork`.
 
