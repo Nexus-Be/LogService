@@ -68,6 +68,10 @@ Khi bắt đầu làm việc tại LogService, AI Agent **BẮT BUỘC PHẢI Đ
 2. **TUYỆT ĐỐI KHÔNG DÙNG REPOSITORY PATTERN BỌC NGOÀI EF CORE**: Sử dụng trực tiếp `LogDbContext` và `DbSet<T>` (hoặc interface `IApplicationDbContext`) trong tầng Application. Cấm tạo `ILogRepository`, `UnitOfWork`.
 3. **CẤU HÌNH PORT 8004 VÀ DATABASE 5436 LÀ BẤT BIẾN (NGỮ CẢNH DOCKER)**: Docker map `8004` (`Dockerfile:3-4`, `docker-compose.yml:37`). ⚠️ `dotnet run` theo `Log.Api/Properties/launchSettings.json:17,27` lại lên `5280`/`7103` — phải chạy `ASPNETCORE_URLS=http://localhost:8004` hoặc `--no-launch-profile` nếu cần khớp gateway.
 4. **HỢP ĐỒNG PROTOBUF ĐỒNG BỘ 100% VỚI GATEWAY**: File hợp đồng thật nằm ở `Log.Api/Contracts/shop.proto` (364 dòng, `service LogApi` tại dòng 72-77), gắn vào build bằng `GrpcServices="Server"` (`Log.Api/Log.Api.csproj:35`).
+5. **CẤM TỰ Ý SỬA ĐỔI BIẾN MÔI TRƯỜNG, SECRET VÀ KEY BÍ MẬT (MANDATORY HUMAN-IN-THE-LOOP FOR SECRETS)**:
+   - **Tuyệt đối CẤM mọi AI Coding Agent tự ý sửa đổi, thay thế, xóa hoặc ghi đè các biến môi trường (`.env`, `.env.*`), Connection Strings, API Keys, JWT Secrets, chứng chỉ hoặc bất kỳ thông tin bí mật (credentials/secrets) nào trong toàn bộ hệ thống.**
+   - **Bắt buộc phải xin ý kiến và nhận được sự đồng ý rõ ràng (explicit approval) từ người dùng trước khi thực hiện bất kỳ thay đổi nào liên quan đến biến môi trường hoặc tài khoản bí mật.**
+   - Khi phát hiện cấu hình môi trường, connection string hoặc secret key có vấn đề hoặc cần cập nhật, Agent **CHỈ ĐƯỢC PHÉP báo cáo hiện trạng, đề xuất phương án và chờ người dùng xác nhận**, tuyệt đối không tự ý can thiệp.
 ---
 ## 💬 NGUYÊN TẮC 5: QUY CHUẨN THÔNG BÁO LỖI TOÀN HỆ THỐNG (MANDATORY ERROR RULES)
 Tất cả các thông báo lỗi (Error Messages, Exceptions, ProblemDetails, Validation Errors, Response Details) **BẮT BUỘC** phải tuân theo 3 nguyên tắc sau:
