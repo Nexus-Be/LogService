@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Log.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(LogDbContext))]
-    [Migration("20261024145456_InitialLogSchema")]
+    [Migration("20261026105503_InitialLogSchema")]
     partial class InitialLogSchema
     {
         /// <inheritdoc />

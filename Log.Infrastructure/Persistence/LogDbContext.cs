@@ -32,10 +32,3 @@ public class LogDbContext : DbContext, IApplicationDbContext
         modelBuilder.AddOutboxStateEntity();
     }
 }
-
-public class AppDbContext : LogDbContext
-{
-    public AppDbContext(DbContextOptions<LogDbContext> options) : base(options)
-    {
-    }
-}
