@@ -27,7 +27,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    options.SerializerOptions.Converters.Add(new Log.Api.Common.Converters.PascalCaseJsonStringEnumConverter(allowIntegerValues: false));
+});
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new Log.Api.Common.Converters.PascalCaseJsonStringEnumConverter(allowIntegerValues: false));
 });
 
 var app = builder.Build();
