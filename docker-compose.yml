@@ -8,7 +8,7 @@
 
 services:
 
-  # 1. Ứng dụng Log Service gRPC (Port 8004)
+  # 1. Ứng dụng Log Service RESTful Web API (Port 8004)
   log-service:
     build:
       context: .
