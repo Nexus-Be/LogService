@@ -1,6 +1,5 @@
 using Log.Api.Extensions;
 using Log.Api.Middleware;
-using Log.Api.Services;
 using Log.Application;
 using Log.Infrastructure;
 using Log.Infrastructure.Persistence;
@@ -15,12 +14,8 @@ builder.Services.AddServiceObservability(builder.Configuration, "Log.Api");
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// 3. gRPC Server
-builder.Services.AddGrpc(options =>
-{
-    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
-});
-builder.Services.AddGrpcReflection();
+// 3. REST MVC Controllers
+builder.Services.AddControllers();
 
 // 4. Swagger / OpenAPI for REST endpoints
 builder.Services.AddEndpointsApiExplorer();
@@ -42,13 +37,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.MapGrpcReflectionService();
 }
 
 app.UseHttpsRedirection();
-
-// 5. Map gRPC Services
-app.MapGrpcService<LogGrpcService>();
 
 // Automatically apply database migrations on startup if relational DB is available
 using (var scope = app.Services.CreateScope())
@@ -67,7 +58,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Log.Api" }));
-app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. LogService is running.");
 
 app.Run();
