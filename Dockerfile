@@ -5,12 +5,11 @@ ENV ASPNETCORE_URLS=http://+:8004
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["Log.sln", "."]
 COPY ["Log.Api/Log.Api.csproj", "Log.Api/"]
 COPY ["Log.Application/Log.Application.csproj", "Log.Application/"]
 COPY ["Log.Domain/Log.Domain.csproj", "Log.Domain/"]
 COPY ["Log.Infrastructure/Log.Infrastructure.csproj", "Log.Infrastructure/"]
-RUN dotnet restore "Log.sln"
+RUN dotnet restore "Log.Api/Log.Api.csproj"
 COPY . .
 RUN dotnet build "Log.Api/Log.Api.csproj" -c Release -o /app/build
 
