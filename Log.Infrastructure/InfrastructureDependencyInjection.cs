@@ -33,7 +33,7 @@ public static class InfrastructureDependencyInjection
         {
             x.SetKebabCaseEndpointNameFormatter();
 
-            x.AddConsumer<GlobalLogConsumer>();
+            x.AddApplicationConsumers();
 
             x.AddEntityFrameworkOutbox<LogDbContext>(o =>
             {

@@ -39,8 +39,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 // Automatically apply database migrations on startup if relational DB is available
 using (var scope = app.Services.CreateScope())
 {

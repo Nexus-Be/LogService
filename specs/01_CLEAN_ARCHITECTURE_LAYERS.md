@@ -1,8 +1,8 @@
 # 01 — PHÂN TẦNG CLEAN ARCHITECTURE & QUY TẮC PHỤ THUỘC (LOG SERVICE)
 
-> **Trạng thái triển khai (2026-10-24):** ✅ CÓ — 4/4 tầng tồn tại đúng cấu trúc, luồng phụ thuộc một chiều không bị phá vỡ. ⚠️ Hai điểm lệch so với mô tả lý tưởng: (a) `Log.Domain` **không** zero-dependency (kéo `MediatR.Contracts 2.0.1`), (b) `Log.Application` kéo trực tiếp MassTransit + EF Core 8.0.10. ❌ "Batching Sink hiệu năng cao" chưa được triển khai.
-> **Nguồn sự thật:** các file `.csproj` trong repo + 40 file `.cs` / 1359 dòng (không tính `Migrations/`).
-> **Cập nhật lần cuối:** 2026-10-24.
+> **Trạng thái triển khai (2026-10-29):** ✅ ĐÃ CHUẨN HÓA — 4 tầng Clean Architecture chuẩn hóa: Inbound Consumer tại `Log.Application/Consumers/SystemEvents/GlobalLogConsumer.cs`, Consumer DI extension `ConsumerExtensions.cs`, REST API Controller tại `Log.Api/Controllers/LogController.cs`. 100% RESTful HTTP/JSON (CẤM gRPC).
+> **Nguồn sự thật:** các file `.csproj` trong repo + code trong `Log.sln` (`Log.Application/Consumers/`, `Log.Infrastructure/InfrastructureDependencyInjection.cs`, `Log.Api/Controllers/LogController.cs`).
+> **Cập nhật lần cuối:** 2026-10-29.
 
 Solution `Log.sln` bao gồm 4 project tương ứng với 4 tầng kiến trúc sạch (Clean Architecture):
 

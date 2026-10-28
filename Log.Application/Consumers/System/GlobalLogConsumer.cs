@@ -1,11 +1,13 @@
-namespace Log.Application.Consumers;
+namespace Log.Application.Consumers.SystemEvents;
 
+using System;
+using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using global::Log.Application.Common.Interfaces;
-using global::Log.Domain.Entities;
-using global::Log.Domain.Events;
+using Log.Application.Common.Interfaces;
+using Log.Domain.Entities;
+using Log.Domain.Events;
 
 public class GlobalLogConsumer : IConsumer<ILogEventOccurred>
 {
@@ -29,7 +31,7 @@ public class GlobalLogConsumer : IConsumer<ILogEventOccurred>
 
         if (config != null && !config.IsEnabled)
         {
-            _logger.LogDebug("Bỏ qua log cho event {EventType} vì IsEnabled = false", msg.EventType);
+            _logger.LogDebug("Skipping log for event {EventType} because IsEnabled = false", msg.EventType);
             return;
         }
 
@@ -45,7 +47,7 @@ public class GlobalLogConsumer : IConsumer<ILogEventOccurred>
             ActorUserId = msg.ActorUserId,
             CorrelationId = context.CorrelationId?.ToString() ?? string.Empty,
             MessageId = context.MessageId?.ToString() ?? string.Empty,
-            TraceId = System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
+            TraceId = global::System.Diagnostics.Activity.Current?.TraceId.ToString() ?? string.Empty,
             Payload = string.IsNullOrWhiteSpace(msg.DetailsJson) ? "{}" : msg.DetailsJson,
             LogLevel = string.IsNullOrWhiteSpace(msg.LogLevel) ? "INFO" : msg.LogLevel
         };
@@ -53,7 +55,7 @@ public class GlobalLogConsumer : IConsumer<ILogEventOccurred>
         _context.Logs.Add(entry);
         await _context.SaveChangesAsync(context.CancellationToken);
 
-        _logger.LogInformation("Đã lưu log: {ServiceName} - {EventType} - {EntityName}:{EntityId}",
+        _logger.LogInformation("Saved log entry: {ServiceName} - {EventType} - {EntityName}:{EntityId}",
             msg.ServiceName, msg.EventType, msg.EntityName, msg.EntityId);
     }
 }
