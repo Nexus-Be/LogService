@@ -10,7 +10,6 @@ public class AppLogFileCatalogConfiguration : IEntityTypeConfiguration<AppLogFil
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.ServiceName).HasMaxLength(100).IsRequired();
-        builder.Property(x => x.Environment).HasConversion<string>();
         builder.Property(x => x.FilePath).HasMaxLength(1000).IsRequired();
         builder.Property(x => x.Checksum).HasMaxLength(100);
         builder.HasIndex(x => new { x.ServiceName, x.LogDate }).IsUnique();

@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Log.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialLogSchema : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,7 +20,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ServiceName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Environment = table.Column<string>(type: "text", nullable: false),
+                    Environment = table.Column<int>(type: "integer", nullable: false),
                     LogDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     FilePath = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     FileSizeBytes = table.Column<long>(type: "bigint", nullable: false),
@@ -49,7 +49,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                     BatchSize = table.Column<int>(type: "integer", nullable: false),
                     FirstRecordId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     LastRecordId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     StartedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CompletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     ErrorMessage = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
@@ -72,7 +72,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                     TraceId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     UserId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     UserName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Action = table.Column<string>(type: "text", nullable: false),
+                    Action = table.Column<int>(type: "integer", nullable: false),
                     EntityName = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     EntityId = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     OldValues = table.Column<string>(type: "jsonb", nullable: true),
@@ -185,12 +185,12 @@ namespace Log.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AlertTitle = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Severity = table.Column<string>(type: "text", nullable: false),
+                    Severity = table.Column<int>(type: "integer", nullable: false),
                     ServiceName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CentralAuditLogId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TriggeredRule = table.Column<string>(type: "text", nullable: false),
+                    TriggeredRule = table.Column<int>(type: "integer", nullable: false),
                     Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     ResolvedBy = table.Column<Guid>(type: "uuid", nullable: true),
                     ResolvedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     ResolutionNote = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
@@ -257,8 +257,8 @@ namespace Log.Infrastructure.Persistence.Migrations
                 columns: new[] { "Id", "Action", "ChangedColumns", "CreatedAt", "DeletedAt", "EntityId", "EntityName", "IpAddress", "IsDeleted", "NewValues", "OldValues", "ServiceName", "SyncedAt", "TraceId", "UpdatedAt", "UserAgent", "UserId", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("90000000-0000-0000-0000-000000000001"), "Approve", "[\"Status\"]", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "cccccccc-3333-3333-3333-333333333334", "SellerProfile", "127.0.0.1", false, "{\"status\":\"Approved\"}", "{\"status\":\"Pending\"}", "User", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "trace-user-approve-seller-001", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "NexusAdminPortal/1.0", "aaaaaaaa-1111-1111-1111-111111111111", "admin@nexus.com" },
-                    { new Guid("90000000-0000-0000-0000-000000000002"), "Create", null, new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "02000000-0000-0000-0000-000000000001", "SubOrder", "127.0.0.1", false, "{\"subOrderNo\":\"SUB-20260101-0001\",\"totalAmount\":850000}", null, "Commerce", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "trace-order-paid-001", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "NexusApp/1.0", "dddddddd-4444-4444-4444-444444444444", "buyer@nexus.com" }
+                    { new Guid("90000000-0000-0000-0000-000000000001"), 5, "[\"Status\"]", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "cccccccc-3333-3333-3333-333333333334", "SellerProfile", "127.0.0.1", false, "{\"status\":\"Approved\"}", "{\"status\":\"Pending\"}", "User", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "trace-user-approve-seller-001", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "NexusAdminPortal/1.0", "aaaaaaaa-1111-1111-1111-111111111111", "admin@nexus.com" },
+                    { new Guid("90000000-0000-0000-0000-000000000002"), 0, null, new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "02000000-0000-0000-0000-000000000001", "SubOrder", "127.0.0.1", false, "{\"subOrderNo\":\"SUB-20260101-0001\",\"totalAmount\":850000}", null, "Commerce", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "trace-order-paid-001", new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "NexusApp/1.0", "dddddddd-4444-4444-4444-444444444444", "buyer@nexus.com" }
                 });
 
             migrationBuilder.InsertData(

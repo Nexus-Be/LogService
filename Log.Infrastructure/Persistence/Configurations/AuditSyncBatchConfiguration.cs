@@ -12,7 +12,6 @@ public class AuditSyncBatchConfiguration : IEntityTypeConfiguration<AuditSyncBat
         builder.Property(x => x.ServiceName).HasMaxLength(100).IsRequired();
         builder.Property(x => x.FirstRecordId).HasMaxLength(100);
         builder.Property(x => x.LastRecordId).HasMaxLength(100);
-        builder.Property(x => x.Status).HasConversion<string>();
         builder.Property(x => x.ErrorMessage).HasMaxLength(2000);
     }
 }

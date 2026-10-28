@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Log.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(LogDbContext))]
-    [Migration("20261026105503_InitialLogSchema")]
-    partial class InitialLogSchema
+    [Migration("20261028094838_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,9 +41,8 @@ namespace Log.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Environment")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Environment")
+                        .HasColumnType("integer");
 
                     b.Property<int>("ErrorCount")
                         .HasColumnType("integer");
@@ -131,9 +130,8 @@ namespace Log.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -149,9 +147,8 @@ namespace Log.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Action")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ChangedColumns")
                         .HasColumnType("jsonb");
@@ -220,7 +217,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = new Guid("90000000-0000-0000-0000-000000000001"),
-                            Action = "Approve",
+                            Action = 5,
                             ChangedColumns = "[\"Status\"]",
                             CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             EntityId = "cccccccc-3333-3333-3333-333333333334",
@@ -240,7 +237,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = new Guid("90000000-0000-0000-0000-000000000002"),
-                            Action = "Create",
+                            Action = 0,
                             CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             EntityId = "02000000-0000-0000-0000-000000000001",
                             EntityName = "SubOrder",
@@ -487,17 +484,14 @@ namespace Log.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("Severity")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Severity")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("TriggeredRule")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("TriggeredRule")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
