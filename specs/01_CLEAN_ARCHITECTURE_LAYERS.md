@@ -71,7 +71,24 @@ Log.sln
 |-----------|---------|------------------|
 | Entity, Enum, domain event interface | `Log.Domain/Entities`, `Log.Domain/Enums`, `Log.Domain/Events` | `LogEntry.cs`, `CentralAuditAction.cs`, `LogEvents.cs` |
 | Query / Command + Handler + Validator | `Log.Application/Features/{Queries,Commands}/<Tên>` | `Features/Queries/QueryLogs/`, `Features/Commands/SetLogEventTypeEnabled/` |
-| MassTransit Consumer | `Log.Application/Consumers` | `GlobalLogConsumer.cs` |
+| MassTransit Consumer | `Log.Infrastructure/Consumers` (hoặc `Log.Application/Consumers`) | `GlobalLogConsumer.cs` |
 | `DbContext`, `IEntityTypeConfiguration`, DI, Migration | `Log.Infrastructure` | `LogDbContext.cs`, `Persistence/Configurations/`, `InfrastructureDependencyInjection.cs` |
-| gRPC service, endpoint REST, middleware, extension DI | `Log.Api` | `Services/LogGrpcService.cs`, `Extensions/ObservabilityExtensions.cs`, `Program.cs` |
+| REST Controller, middleware, extension DI | `Log.Api` | `Controllers/LogController.cs`, `Extensions/ObservabilityExtensions.cs`, `Program.cs` |
 | Batching Sink (khi triển khai) | `Log.Infrastructure` | ❌ chưa có |
+
+---
+
+## 4. QUY CHUẨN CẤU TRÚC CHUẨN HÓA (SERVICE BLUEPRINT)
+1. **Giao tiếp đồng bộ (RESTful)**:
+   - `Log.Api/Controllers/`: Thin Dispatcher Controller, chỉ nhận request, gọi Service/MediatR Interface trong Application, trả về `IActionResult`. Tuyệt đối cấm logic nghiệp vụ, cấm map anonymous object, cấm khai báo class DTO trong file controller.
+   - `Log.Application/`: Chứa các Request/Response DTOs dùng chung cho Controller, Query/Command handlers.
+2. **Giao tiếp bất đồng bộ (RabbitMQ MassTransit)**:
+   - `Log.Application/Contracts/`: Chứa các Integration Events (ví dụ: `ILogEventOccurred`).
+   - `Log.Infrastructure/Consumers/`: Chứa các MassTransit Consumer xử lý sự kiện ghi log phân tán.
+3. **Quản lý Dependency Injection**:
+   - `Log.Application/`: Đăng ký MediatR/Application Services.
+   - `Log.Infrastructure/`: Đăng ký `LogDbContext`, MassTransit Bus, Consumers.
+4. **Validation**:
+   - Input format validation đặt tại Request DTOs qua Data Annotations hoặc FluentValidation.
+   - Business validation đặt tại Application Services hoặc Domain Exceptions.
+
