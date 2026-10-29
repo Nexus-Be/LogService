@@ -12,9 +12,10 @@ public static class InfrastructureDependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var rawConnection = configuration.GetConnectionString("DefaultConnection") 
+        var rawConnection = configuration.GetConnectionString("DefaultConnection")
             ?? configuration["CONNECTION_STRING"]
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found in configuration.");
+            ?? configuration["LOG_CONNECTION_STRING"]
+            ?? "Host=localhost;Port=5436;Database=log_db;Username=postgres;Password=postgres";
         var connectionString = NormalizeConnectionString(rawConnection);
 
         services.AddDbContext<LogDbContext>(options =>
