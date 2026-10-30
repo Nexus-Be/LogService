@@ -3,32 +3,26 @@ namespace Log.Api.Controllers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Log.Application.DTOs;
-using Log.Application.Features.Commands.SetLogEventTypeEnabled;
-using Log.Application.Features.Queries.GetLog;
-using Log.Application.Features.Queries.ListLogEventTypes;
-using Log.Application.Features.Queries.QueryLogs;
+using Log.Application.Services.Log;
 
 [ApiController]
-[Route("api/v1")]
+[Route("api/v1/log")]
 public sealed class LogController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly ILogService _logService;
     private readonly ILogger<LogController> _logger;
 
-    public LogController(IMediator mediator, ILogger<LogController> logger)
+    public LogController(ILogService logService, ILogger<LogController> logger)
     {
-        _mediator = mediator;
+        _logService = logService;
         _logger = logger;
     }
 
-    [HttpGet("log/logs")]
-    [HttpGet("admin/logs")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpGet("logs")]
+    [ProducesResponseType(typeof(LogPageResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> QueryLogs(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
@@ -43,9 +37,9 @@ public sealed class LogController : ControllerBase
         [FromQuery] string? logLevel = null,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("[REST QueryLogs] Query logs page: {Page}, size: {PageSize}, service: {ServiceName}", page, pageSize, serviceName);
+        _logger.LogInformation("Querying logs: page {Page}, size {PageSize}, service {ServiceName}", page, pageSize, serviceName);
 
-        var query = new QueryLogsQuery(
+        var request = new QueryLogsRequest(
             page,
             pageSize,
             from,
@@ -59,21 +53,12 @@ public sealed class LogController : ControllerBase
             logLevel
         );
 
-        var result = await _mediator.Send(query, cancellationToken);
-
-        return Ok(new
-        {
-            items = result.Items,
-            totalItems = result.Total,
-            total = result.Total,
-            pageNumber = page,
-            pageSize = pageSize,
-            totalPages = (int)Math.Ceiling((double)result.Total / (pageSize <= 0 ? 20 : pageSize))
-        });
+        var result = await _logService.QueryLogsAsync(request, cancellationToken);
+        return Ok(result);
     }
 
-    [HttpGet("log/logs/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpGet("logs/{id}")]
+    [ProducesResponseType(typeof(LogEntryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetLog(string id, CancellationToken cancellationToken)
@@ -83,8 +68,8 @@ public sealed class LogController : ControllerBase
             return BadRequest(new { title = "Invalid input", detail = "Log ID must be a valid GUID.", errorCode = "VAL_INVALID_INPUT" });
         }
 
-        _logger.LogInformation("[REST GetLog] Fetching log by Id: '{Id}'", id);
-        var item = await _mediator.Send(new GetLogQuery(guidId), cancellationToken);
+        _logger.LogInformation("Fetching log by ID: {Id}", id);
+        var item = await _logService.GetLogByIdAsync(guidId, cancellationToken);
         if (item == null)
         {
             return NotFound(new { title = "Not found", detail = "Log entry not found.", errorCode = "LOG_NOT_FOUND" });
@@ -93,46 +78,40 @@ public sealed class LogController : ControllerBase
         return Ok(item);
     }
 
-    [HttpGet("log/event-types")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpGet("event-types")]
+    [ProducesResponseType(typeof(LogEventTypeListResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListLogEventTypes(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("[REST ListLogEventTypes] Fetching all log event types");
-        var result = await _mediator.Send(new ListLogEventTypesQuery(), cancellationToken);
-
-        return Ok(new
-        {
-            items = result.Items,
-            total = result.Total
-        });
+        _logger.LogInformation("Listing all log event types");
+        var result = await _logService.ListEventTypesAsync(cancellationToken);
+        return Ok(result);
     }
 
-    [HttpPut("log/event-types/{code}")]
-    [HttpPut("log/event-types/{code}/status")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpPut("event-types/{code}")]
+    [ProducesResponseType(typeof(LogEventTypeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SetLogEventTypeEnabled(string code, [FromBody] SetLogEventTypeEnabledApiRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> SetLogEventTypeEnabled(
+        string code,
+        [FromBody] SetLogEventTypeEnabledRequest request,
+        CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(code))
         {
             return BadRequest(new { title = "Invalid input", detail = "Event type code is required.", errorCode = "VAL_INVALID_INPUT" });
         }
 
-        _logger.LogInformation("[REST SetLogEventTypeEnabled] Code: '{Code}', Enabled: {Enabled}", code, request.IsEnabled);
-        var result = await _mediator.Send(new SetLogEventTypeEnabledCommand(code.Trim(), request.IsEnabled), cancellationToken);
-
+        var normalizedRequest = request with { Code = code.Trim() };
+        _logger.LogInformation("Setting event type {Code} enabled: {Enabled}", code, request.IsEnabled);
+        var result = await _logService.SetEventTypeEnabledAsync(normalizedRequest, cancellationToken);
         return Ok(result);
     }
 
-    [HttpPost("log/batch")]
+    [HttpPost("batch")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public IActionResult BatchLog([FromBody] object payload)
+    public async Task<IActionResult> BatchLog([FromBody] object payload, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("[REST BatchLog] Received log batch ingestion request");
+        _logger.LogInformation("Received log batch ingestion request");
+        await _logService.IngestBatchAsync(payload, cancellationToken);
         return Accepted(new { success = true, message = "Log batch accepted for processing." });
     }
 }
-
-public sealed record SetLogEventTypeEnabledApiRequest(
-    bool IsEnabled
-);

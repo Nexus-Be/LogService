@@ -1,6 +1,5 @@
 namespace Log.Infrastructure.Persistence;
 
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using global::Log.Application.Common.Interfaces;
 using global::Log.Domain.Entities;
@@ -25,10 +24,5 @@ public class LogDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LogDbContext).Assembly);
         Seeds.LogSeedData.SeedAll(modelBuilder);
-
-        // MassTransit Transactional Outbox entities
-        modelBuilder.AddInboxStateEntity();
-        modelBuilder.AddOutboxMessageEntity();
-        modelBuilder.AddOutboxStateEntity();
     }
 }

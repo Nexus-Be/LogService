@@ -1,5 +1,4 @@
 using Log.Api.Extensions;
-using Log.Api.Middleware;
 using Log.Application;
 using Log.Infrastructure;
 using Log.Infrastructure.Persistence;
@@ -7,37 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. OpenTelemetry Distributed Tracing
-builder.Services.AddServiceObservability(builder.Configuration, "Log.Api");
+// 1. Auxiliary Service Defaults (Observability, Swagger, JSON options)
+builder.Services.AddServiceDefaults(builder.Configuration, "log-service");
 
-// 2. Application & Infrastructure Layers
+// 2. Application & Infrastructure Dependency Injection
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// 3. REST MVC Controllers
+// 3. REST Services
 builder.Services.AddControllers();
-
-// 4. Swagger / OpenAPI for REST endpoints
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.Converters.Add(new Log.Api.Common.Converters.PascalCaseJsonStringEnumConverter(allowIntegerValues: false));
-});
-builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new Log.Api.Common.Converters.PascalCaseJsonStringEnumConverter(allowIntegerValues: false));
-});
 
 var app = builder.Build();
 
-app.UseGlobalExceptionHandler();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// 4. Default Middleware Pipeline (Exception Handler, Swagger UI)
+app.UseServiceDefaults();
 
 // Automatically apply database migrations on startup if relational DB is available
 using (var scope = app.Services.CreateScope())
@@ -57,6 +39,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Log.Api" }));
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "log-service" }));
 
 app.Run();

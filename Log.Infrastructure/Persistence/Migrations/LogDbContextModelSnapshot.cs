@@ -84,6 +84,26 @@ namespace Log.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("AppLogFileCatalogs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("93000000-0000-0000-0000-000000000001"),
+                            Checksum = "sha256-abc123def456",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Environment = 2,
+                            ErrorCount = 0,
+                            FilePath = "/var/log/nexus/gateway-2026-01-01.log",
+                            FileSizeBytes = 1048576L,
+                            IsActive = true,
+                            IsDeleted = false,
+                            IsDisabled = false,
+                            LogDate = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ServiceName = "ApiGateway",
+                            TotalLines = 5000,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            WarningCount = 2
+                        });
                 });
 
             modelBuilder.Entity("Log.Domain.Entities.AuditSyncBatch", b =>
@@ -136,6 +156,22 @@ namespace Log.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AuditSyncBatches");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("92000000-0000-0000-0000-000000000001"),
+                            BatchSize = 10,
+                            CompletedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 1, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            FirstRecordId = "rec-001",
+                            IsDeleted = false,
+                            LastRecordId = "rec-010",
+                            ServiceName = "Commerce",
+                            StartedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Status = 0,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
                 });
 
             modelBuilder.Entity("Log.Domain.Entities.CentralAuditLog", b =>
@@ -350,6 +386,56 @@ namespace Log.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Logs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("91000000-0000-0000-0000-000000000001"),
+                            Action = "PAYMENT_COMPLETED",
+                            ActorRole = "Buyer",
+                            ActorUserId = "dddddddd-4444-4444-4444-444444444444",
+                            ActorUsername = "buyer@nexus.com",
+                            CausationId = "cause-order-001",
+                            CorrelationId = "corr-order-001",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8355), new TimeSpan(0, 0, 0, 0, 0)),
+                            EntityId = "02000000-0000-0000-0000-000000000001",
+                            EntityName = "SubOrder",
+                            EventType = "ORDER_PAID",
+                            IsDeleted = false,
+                            LogLevel = "INFO",
+                            MessageId = "msg-order-001",
+                            OccurredAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Payload = "{\"amount\":850000,\"currency\":\"VND\",\"subOrderNo\":\"SUB-20260101-0001\"}",
+                            RecordedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            SchemaVersion = 1,
+                            ServiceName = "Commerce",
+                            TraceId = "trace-order-paid-001",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8355), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("91000000-0000-0000-0000-000000000002"),
+                            Action = "ACCOUNT_CREATED",
+                            ActorRole = "Buyer",
+                            ActorUserId = "dddddddd-4444-4444-4444-444444444444",
+                            ActorUsername = "buyer@nexus.com",
+                            CausationId = "cause-user-reg-001",
+                            CorrelationId = "corr-user-reg-001",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8363), new TimeSpan(0, 0, 0, 0, 0)),
+                            EntityId = "dddddddd-4444-4444-4444-444444444444",
+                            EntityName = "User",
+                            EventType = "USER_REGISTER",
+                            IsDeleted = false,
+                            LogLevel = "INFO",
+                            MessageId = "msg-user-reg-001",
+                            OccurredAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Payload = "{\"email\":\"buyer@nexus.com\",\"role\":\"Buyer\"}",
+                            RecordedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            SchemaVersion = 1,
+                            ServiceName = "User",
+                            TraceId = "trace-user-reg-001",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8364), new TimeSpan(0, 0, 0, 0, 0))
+                        });
                 });
 
             modelBuilder.Entity("Log.Domain.Entities.LogEventType", b =>
@@ -498,174 +584,25 @@ namespace Log.Infrastructure.Persistence.Migrations
                     b.HasIndex("CentralAuditLogId");
 
                     b.ToTable("SecurityAuditAlerts");
-                });
 
-            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime?>("Consumed")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ConsumerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("Delivered")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ExpirationTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long?>("LastSequenceNumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("LockId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("MessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ReceiveCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("Received")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Delivered");
-
-                    b.ToTable("InboxState");
-                });
-
-            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
-                {
-                    b.Property<long>("SequenceNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SequenceNumber"));
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<Guid?>("ConversationId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("CorrelationId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DestinationAddress")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<DateTime?>("EnqueueTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ExpirationTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FaultAddress")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("Headers")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("InboxConsumerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("InboxMessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("InitiatorId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("MessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("MessageType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("OutboxId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Properties")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("RequestId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ResponseAddress")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<DateTime>("SentTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("SourceAddress")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("SequenceNumber");
-
-                    b.HasIndex("EnqueueTime");
-
-                    b.HasIndex("ExpirationTime");
-
-                    b.HasIndex("OutboxId", "SequenceNumber")
-                        .IsUnique();
-
-                    b.HasIndex("InboxMessageId", "InboxConsumerId", "SequenceNumber")
-                        .IsUnique();
-
-                    b.ToTable("OutboxMessage");
-                });
-
-            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxState", b =>
-                {
-                    b.Property<Guid>("OutboxId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("Delivered")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long?>("LastSequenceNumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("LockId")
-                        .HasColumnType("uuid");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
-
-                    b.HasKey("OutboxId");
-
-                    b.HasIndex("Created");
-
-                    b.ToTable("OutboxState");
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("94000000-0000-0000-0000-000000000001"),
+                            AlertTitle = "Xét duyệt người bán hàng đặc cách",
+                            CentralAuditLogId = new Guid("90000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Ghi nhận nâng cấp quyền người bán trong đợt khởi tạo",
+                            IsDeleted = false,
+                            ResolutionNote = "Thao tác hợp lệ bởi Administrator.",
+                            ResolvedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            ResolvedBy = new Guid("aaaaaaaa-1111-1111-1111-111111111111"),
+                            ServiceName = "User",
+                            Severity = 0,
+                            Status = 2,
+                            TriggeredRule = 2,
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
                 });
 
             modelBuilder.Entity("Log.Domain.Entities.SecurityAuditAlert", b =>
@@ -677,18 +614,6 @@ namespace Log.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("CentralAuditLog");
-                });
-
-            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
-                {
-                    b.HasOne("MassTransit.EntityFrameworkCoreIntegration.OutboxState", null)
-                        .WithMany()
-                        .HasForeignKey("OutboxId");
-
-                    b.HasOne("MassTransit.EntityFrameworkCoreIntegration.InboxState", null)
-                        .WithMany()
-                        .HasForeignKey("InboxMessageId", "InboxConsumerId")
-                        .HasPrincipalKey("MessageId", "ConsumerId");
                 });
 
             modelBuilder.Entity("Log.Domain.Entities.CentralAuditLog", b =>
