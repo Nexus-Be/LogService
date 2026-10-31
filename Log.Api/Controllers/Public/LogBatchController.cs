@@ -1,4 +1,4 @@
-namespace Log.Api.Controllers.Internal;
+namespace Log.Api.Controllers.Public;
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,13 +8,13 @@ using Microsoft.Extensions.Logging;
 using Log.Application.Services.Log;
 
 [ApiController]
-[Route("api/v1/internal/logs")]
-public sealed class InternalLogController : ControllerBase
+[Route("api/v1/logs")]
+public sealed class LogBatchController : ControllerBase
 {
     private readonly ILogService _logService;
-    private readonly ILogger<InternalLogController> _logger;
+    private readonly ILogger<LogBatchController> _logger;
 
-    public InternalLogController(ILogService logService, ILogger<InternalLogController> logger)
+    public LogBatchController(ILogService logService, ILogger<LogBatchController> logger)
     {
         _logService = logService;
         _logger = logger;
@@ -25,7 +25,7 @@ public sealed class InternalLogController : ControllerBase
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     public async Task<IActionResult> BatchLog([FromBody] object payload, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("[REST Internal Log] Received log batch ingestion request");
+        _logger.LogInformation("[REST Log] Received log batch ingestion request");
         await _logService.IngestBatchAsync(payload, cancellationToken);
         return Accepted(new { success = true, message = "Log batch accepted for processing." });
     }

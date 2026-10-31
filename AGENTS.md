@@ -25,6 +25,12 @@ This project is indexed by GitNexus as **LogService** (414 symbols, 557 relation
 
 ---
 
+## Endpoint Workflow
+
+Before adding or changing any REST endpoint, follow the local checklist at `.agents/skills/new-feature-endpoint/SKILL.md`. It covers contract, persistence, Application, Api, tests, documentation handoff, and verification. This repository is Inward-Only, so the checklist is self-contained.
+
+---
+
 ## 🛑 NGUYÊN TẮC 1: BẮT BUỘC LẬP KẾ HOẠCH TRƯỚC KHI HÀNH ĐỘNG (PLAN-FIRST RULE)
 
 Mọi AI Agent khi nhận nhiệm vụ kỹ thuật tại LogService **BẮT BUỘC PHẢI LẬP VÀ TRÌNH BÀY PLAN** trước khi thực hiện bất kỳ hành động sửa đổi mã nguồn, thêm/xóa file, refactor, tạo migration database hay thay đổi cấu hình nào.
@@ -75,10 +81,9 @@ Khi bắt đầu làm việc tại LogService, AI Agent **BẮT BUỘC PHẢI Đ
    - Toàn bộ thao tác truy vấn phân trang logs bắt buộc thực hiện trực tiếp tại Database qua `.Skip((page - 1) * pageSize).Take(pageSize)` và `.CountAsync()`.
    - Đóng gói dữ liệu trả về theo cấu trúc phân trang chuẩn `PagedData<T>` (`items` và metadata `pagination: { pageIndex, pageSize, totalCount, totalPages, hasPreviousPage, hasNextPage }`).
    - TUYỆT ĐỐI CẤM trả về danh sách log thô lớn không giới hạn để Gateway tự phân trang.
-8. **QUY CHUẨN PHÂN TÁCH PUBLIC VÀ INTERNAL REST API (INTERNAL API SEGREGATION)**:
-   - Cấu trúc thư mục Controller tại `Log.Api/Controllers/` bắt buộc chia thành `Controllers/Public/` (`/api/v1/logs`, `/api/v1/logs/event-types`) và `Controllers/Internal/` (`/api/v1/internal/logs/batch`).
-   - Mọi endpoint nạp log nội bộ đặt tại `InternalLogController` (`POST /api/v1/internal/logs/batch`) bắt buộc qua `InternalServiceAuthMiddleware` kiểm tra header `X-Internal-Service-Key`.
-   - TUYỆT ĐỐI CẤM mở endpoint nạp lô log nội bộ ra ngoài API Gateway.
+8. **INTERNAL API ĐANG TẠM KHÓA (2026-10-31)**:
+   - Route liên service dùng đường dẫn công khai, không còn `/api/v1/internal`.
+   - `InternalServiceAuthMiddleware` và `InternalServiceAuthHandler` đã comment đăng ký; không yêu cầu `X-Internal-Service-Key`.
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## 1. Role as Central Audit Aggregator
 * Each sibling microservice owns its `AuditLogs` table as the transactional source of truth.
-* `LogService` is the cross-service aggregation vault that receives optional background batches via internal route `POST /api/v1/internal/logs/batch`.
+* `LogService` is the cross-service aggregation vault that receives optional background batches via the public route `POST /api/v1/logs/batch`.
 * Payload stored as `jsonb` in PostgreSQL (`Logs.Payload`).
 * Aggregation never replaces the local audit row and never runs inside a business transaction.
 
