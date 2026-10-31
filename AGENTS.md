@@ -65,20 +65,38 @@ Khi bắt đầu làm việc tại LogService, AI Agent **BẮT BUỘC PHẢI Đ
 2. **TUYỆT ĐỐI KHÔNG DÙNG REPOSITORY PATTERN BỌC NGOÀI EF CORE**: Sử dụng trực tiếp `LogDbContext` và `DbSet<T>` (hoặc interface `IApplicationDbContext`) trong tầng Application. Cấm tạo `ILogRepository`, `UnitOfWork`.
 3. **CẤU HÌNH PORT 8004 VÀ DATABASE 5436 LÀ BẤT BIẾN**.
 4. **CẤM SỬ DỤNG gRPC VÀ BÃI BỎ MESSAGE BROKER — 100% RESTFUL API**:
-   - Toàn bộ giao tiếp đồng bộ qua RESTful Web API (`LogController.cs`). Cấm gRPC, Protobuf, RabbitMQ, MassTransit.
+   - Toàn bộ giao tiếp đồng bộ qua RESTful Web API (`LogController.cs`) với quy chuẩn 100% số nhiều cho collections: `/api/v1/logs`. Cấm gRPC, Protobuf, RabbitMQ, MassTransit.
 5. **CẤM TRÙNG LẶP ROUTE ALIAS**:
-   - Cấm khai báo route phụ `admin/logs` trên action `QueryLogs`. Chỉ dùng một route duy nhất `[HttpGet("logs")]`.
+   - Cấm khai báo route phụ `admin/logs` trên action `QueryLogs`. Chỉ dùng một route duy nhất `[HttpGet]` trên controller `[Route("api/v1/logs")]`.
 6. **FEATURE CO-LOCATION & 1-TO-1 CONTROLLER PAIRING**:
    - Tầng Application: Toàn bộ use cases đặt tại `Log.Application/Services/Log/` gồm `ILogService.cs`, `LogService.cs`, `LogRequests.cs`, `LogResponses.cs`, `LogDtos.cs`. Cấm MediatR CQRS.
    - Tầng Api: Ghép cặp 1-to-1 với `LogController.cs`, chỉ inject duy nhất `ILogService`.
+7. **QUY CHUẨN PHÂN TRANG (PAGINATION GOVERNANCE)**:
+   - Toàn bộ thao tác truy vấn phân trang logs bắt buộc thực hiện trực tiếp tại Database qua `.Skip((page - 1) * pageSize).Take(pageSize)` và `.CountAsync()`.
+   - Đóng gói dữ liệu trả về theo cấu trúc phân trang chuẩn `PagedData<T>` (`items` và metadata `pagination: { pageIndex, pageSize, totalCount, totalPages, hasPreviousPage, hasNextPage }`).
+   - TUYỆT ĐỐI CẤM trả về danh sách log thô lớn không giới hạn để Gateway tự phân trang.
+8. **QUY CHUẨN PHÂN TÁCH PUBLIC VÀ INTERNAL REST API (INTERNAL API SEGREGATION)**:
+   - Cấu trúc thư mục Controller tại `Log.Api/Controllers/` bắt buộc chia thành `Controllers/Public/` (`/api/v1/logs`, `/api/v1/logs/event-types`) và `Controllers/Internal/` (`/api/v1/internal/logs/batch`).
+   - Mọi endpoint nạp log nội bộ đặt tại `InternalLogController` (`POST /api/v1/internal/logs/batch`) bắt buộc qua `InternalServiceAuthMiddleware` kiểm tra header `X-Internal-Service-Key`.
+   - TUYỆT ĐỐI CẤM mở endpoint nạp lô log nội bộ ra ngoài API Gateway.
 
 ---
 
-## 💬 NGUYÊN TẮC 5: QUY CHUẨN THÔNG BÁO LỖI TOÀN HỆ THỐNG
+## 💬 NGUYÊN TẮC 5: QUY CHUẨN THÔNG BÁO LỖI TOÀN HỆ THỐNG (MANDATORY ERROR & ENUM RULES)
 
-1. **Ngôn ngữ (100% English)**: Toàn bộ thông báo lỗi viết bằng tiếng Anh. Tuyệt đối không dùng tiếng Việt.
-2. **Quy cách viết hoa (Sentence case)**: Viết hoa duy nhất chữ cái đầu câu: `"Log entry not found with the specified ID."`
-3. **Mã lỗi (SCREAMING_SNAKE_CASE)**: `LOG_NOT_FOUND`, `EVENT_TYPE_DISABLED`, `VAL_INVALID_INPUT`, `UNAUTHORIZED`, `FORBIDDEN`.
+1. **Ngôn ngữ (100% English)**: Toàn bộ thông báo lỗi viết bằng 100% tiếng Anh. Tuyệt đối CẤM dùng tiếng Việt trong response và runtime exception.
+2. **Quy cách viết hoa thông báo lỗi (100% Sentence case)**:
+   - Viết hoa DUY NHẤT chữ cái đầu tiên của câu thông báo.
+   - Toàn bộ các từ tiếp theo viết thường, TRỪ các từ viết tắt kỹ thuật hoặc tên riêng: `ID`, `OTP`, `JWT`, `URL`, `UUID`, `Email`, `API`, `HTTP`.
+   - TUYỆT ĐỐI CẤM viết hoa toàn bộ thông báo lỗi (ví dụ cấm: `"LOG NOT FOUND"`).
+   - Ví dụ đúng: `"Log entry not found with the specified ID."`, `"Event type is disabled."`
+3. **Mã lỗi (100% SCREAMING_SNAKE_CASE)**:
+   - Viết hoa toàn bộ và nối bằng gạch dưới: `LOG_NOT_FOUND`, `EVENT_TYPE_DISABLED`, `VAL_INVALID_INPUT`, `UNAUTHORIZED`, `FORBIDDEN`.
+   - CẤM tiền tố `ERR_`. Tiền tố `VAL_` chỉ dành riêng cho validation.
+4. **Quy chuẩn Tuần tự hóa Enum đầu ra REST API (PascalCase Serialization)**:
+   - 100% Enum trả về trong JSON envelope phải là chuỗi `PascalCase` (`"Information"`, `"Warning"`, `"Error"`), cấm chuỗi in hoa toàn bộ hoặc số nguyên.
+5. **Cơ chế Duy trì Rule Bền vững ("Ghi vào Rule")**:
+   - Khi Người dùng (Sếp) chỉ thị "ghi vào rule", AI Agent bắt buộc phải lập tức ghi nhận và đồng bộ vào file này, `.agents/AGENTS.md`, root `AGENTS.md` và `.cursor/rules/`.
 
 ---
 

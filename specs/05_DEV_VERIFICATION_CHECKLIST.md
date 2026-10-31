@@ -49,7 +49,7 @@ curl -s http://localhost:8004/health
 curl -s http://localhost:8004/
 
 # PHẢI TRẢ 404 — endpoint này KHÔNG TỒN TẠI trong code
-curl -s -o /dev/null -w "%{http_code}\n" -X POST http://localhost:8004/api/v1/log/batch \
+curl -s -o /dev/null -w "%{http_code}\n" -X POST http://localhost:8004/api/v1/internal/logs/batch \
   -H "Content-Type: application/json" -d '[]'
 ```
 
@@ -57,7 +57,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST http://localhost:8004/api/v1/lo
 |---|------------|---------|----------------------|
 | 1 | `GET /health` | `200` + `{"status":"Healthy","service":"Log.Api"}` | ✅ CÓ (`Program.cs:66`) — ⚠️ **hằng số**, không kiểm tra DB |
 | 2 | `GET /` | `200` + chuỗi hướng dẫn gRPC | ✅ CÓ (`Program.cs:67`) |
-| 3 | `POST /api/v1/log/batch` | **404** | ❌ KHÔNG TỒN TẠI (xem `specs/02` §3.1) |
+| 3 | `POST /api/v1/internal/logs/batch` | **404** | ❌ KHÔNG TỒN TẠI (xem `specs/02` §3.1) |
 | 4 | `GET /swagger` (Development) | `200` Swagger UI | ✅ CÓ (`Program.cs:37-40`) |
 
 ### 2.2. gRPC (cần `grpcurl`)
@@ -124,7 +124,7 @@ grpcurl -plaintext -d '{"code":"USER_REGISTER","enabled":false}' \
 - [ ] ❌ **Index hiệu năng**: `0/5` index trên `Logs` — xem `specs/04` §3.
 - [ ] ❌ **Test project**: `0` — xem §4.
 - [ ] ❌ **`Log.Api/Log.Api.http`**: còn `GET {{Log.Api_HostAddress}}/weatherforecast/` (`Log.Api/Log.Api.http:3`) → luôn **404**; phải đổi sang `/health` hoặc một rpc mẫu.
-- [ ] ❌ **Endpoint batch**: nếu Gateway thật sự gọi `POST /api/v1/log/batch` thì phải hiện thực hoặc sửa phía gọi — xem `specs/02` §3.1.
+- [ ] ❌ **Endpoint batch**: nếu Gateway thật sự gọi `POST /api/v1/internal/logs/batch` thì phải hiện thực hoặc sửa phía gọi — xem `specs/02` §3.1.
 - [ ] ❌ **Đường ghi log**: `GlobalLogConsumer` không có publisher — xem `specs/03` §1.3.
 - [ ] ❌ **Đường dẫn `.tools/dotnet-ef`**: **không tồn tại** trong repo. Dùng `dotnet ef` (global tool) hoặc `dotnet ef` qua `Microsoft.EntityFrameworkCore.Tools` (`Log.Infrastructure/Log.Infrastructure.csproj:16`).
 - [ ] ❌ **`ValidationException` → 500**: `Log.Api/Middleware/GlobalExceptionHandlerMiddleware.cs:58-62` thiếu nhánh `FluentValidation.ValidationException` ⇒ phải trả `InvalidArgument`/`400` + `VAL_INVALID_INPUT`.
@@ -205,7 +205,7 @@ docker compose down -v       # xóa luôn dữ liệu
 
 - [ ] Mọi file đã sửa đều là `.md`.
 - [ ] Mọi bảng rpc / endpoint / event / bảng DB đều có cột `Trạng thái` + `Bằng chứng` dạng `file:line`.
-- [ ] Không còn phát biểu sai: `POST /api/v1/log/batch`, `LogEntries`, `logs`, `LogSeverity`, `AuditAction`, `LogService.sln`, `MassTransit 8.4.1`, `.tools/dotnet-ef`, "đã có 5 index", "có test".
+- [ ] Không còn phát biểu sai: `POST /api/v1/internal/logs/batch`, `LogEntries`, `logs`, `LogSeverity`, `AuditAction`, `LogService.sln`, `MassTransit 8.4.1`, `.tools/dotnet-ef`, "đã có 5 index", "có test".
 - [ ] Banner có đủ 3 dòng: trạng thái (✅/⚠️/❌ + số liệu), nguồn sự thật, ngày cập nhật.
 - [ ] `AGENTS.md` và `CLAUDE.md` **giống hệt nhau** (byte-identical).
 - [ ] `git diff --stat` chỉ chứa `.md`.

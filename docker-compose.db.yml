@@ -1,3 +1,5 @@
+name: nexus-db-log
+
 services:
   postgres-log:
     image: postgres:16-alpine

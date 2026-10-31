@@ -3,7 +3,7 @@ namespace Log.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using global::Log.Application.Common.Interfaces;
+using global::Log.Application.Interfaces;
 using global::Log.Infrastructure.Persistence;
 
 public static class DependencyInjection
@@ -13,7 +13,14 @@ public static class DependencyInjection
         var rawConnection = configuration.GetConnectionString("DefaultConnection") 
             ?? configuration["CONNECTION_STRING"]
             ?? configuration["LOG_CONNECTION_STRING"]
-            ?? "Host=localhost;Port=5436;Database=log_db;Username=postgres;Password=postgres";
+            ?? configuration["LOG_DB_CONNECTION"]
+            ?? Environment.GetEnvironmentVariable("LOG_CONNECTION_STRING")
+            ?? Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+        if (string.IsNullOrWhiteSpace(rawConnection) || rawConnection.Contains("REPLACE_WITH"))
+        {
+            throw new InvalidOperationException("Database connection string for LogService is not configured. Set 'ConnectionStrings:DefaultConnection' or environment variable 'LOG_CONNECTION_STRING'.");
+        }
         var connectionString = NormalizeConnectionString(rawConnection);
 
         services.AddDbContext<LogDbContext>(options =>

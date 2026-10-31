@@ -1,3 +1,4 @@
+using Log.Api.Common;
 using Log.Api.Extensions;
 using Log.Application;
 using Log.Infrastructure;
@@ -14,7 +15,11 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // 3. REST Services
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = ApiValidationProblemFactory.Create;
+    });
 
 var app = builder.Build();
 

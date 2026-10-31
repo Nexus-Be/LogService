@@ -397,7 +397,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                             ActorUsername = "buyer@nexus.com",
                             CausationId = "cause-order-001",
                             CorrelationId = "corr-order-001",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8355), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 31, 0, 24, 7, 241, DateTimeKind.Unspecified).AddTicks(1420), new TimeSpan(0, 0, 0, 0, 0)),
                             EntityId = "02000000-0000-0000-0000-000000000001",
                             EntityName = "SubOrder",
                             EventType = "ORDER_PAID",
@@ -410,7 +410,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                             SchemaVersion = 1,
                             ServiceName = "Commerce",
                             TraceId = "trace-order-paid-001",
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8355), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 10, 31, 0, 24, 7, 241, DateTimeKind.Unspecified).AddTicks(1420), new TimeSpan(0, 0, 0, 0, 0))
                         },
                         new
                         {
@@ -421,7 +421,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                             ActorUsername = "buyer@nexus.com",
                             CausationId = "cause-user-reg-001",
                             CorrelationId = "corr-user-reg-001",
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8363), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 10, 31, 0, 24, 7, 241, DateTimeKind.Unspecified).AddTicks(1429), new TimeSpan(0, 0, 0, 0, 0)),
                             EntityId = "dddddddd-4444-4444-4444-444444444444",
                             EntityName = "User",
                             EventType = "USER_REGISTER",
@@ -434,7 +434,7 @@ namespace Log.Infrastructure.Persistence.Migrations
                             SchemaVersion = 1,
                             ServiceName = "User",
                             TraceId = "trace-user-reg-001",
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 10, 30, 5, 44, 21, 94, DateTimeKind.Unspecified).AddTicks(8364), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 10, 31, 0, 24, 7, 241, DateTimeKind.Unspecified).AddTicks(1430), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
 

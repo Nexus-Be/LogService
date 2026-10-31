@@ -18,13 +18,6 @@ public sealed record LogEntryResponse(
     string LogLevel,
     string Payload);
 
-public sealed record LogPageResponse(
-    IReadOnlyList<LogEntryResponse> Items,
-    int TotalItems,
-    int PageNumber,
-    int PageSize,
-    int TotalPages);
-
 public sealed record LogEventTypeResponse(
     string Code,
     string ServiceName,

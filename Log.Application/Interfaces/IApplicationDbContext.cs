@@ -1,4 +1,4 @@
-namespace Log.Application.Common.Interfaces;
+namespace Log.Application.Interfaces;
 
 using Microsoft.EntityFrameworkCore;
 using global::Log.Domain.Entities;

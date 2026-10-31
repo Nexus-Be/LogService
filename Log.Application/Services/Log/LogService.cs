@@ -7,9 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using global::Log.Application.Common.Interfaces;
+using global::Log.Application.Interfaces;
 using global::Log.Domain.Entities;
 using global::Log.Domain.Exceptions;
+using global::Log.Application.Common;
+using global::Log.Application.Common.Models;
 
 public sealed class LogService : ILogService
 {
@@ -22,10 +24,9 @@ public sealed class LogService : ILogService
         _logger = logger;
     }
 
-    public async Task<LogPageResponse> QueryLogsAsync(QueryLogsRequest request, CancellationToken cancellationToken = default)
+    public async Task<PagedData<LogEntryResponse>> QueryLogsAsync(QueryLogsRequest request, CancellationToken cancellationToken = default)
     {
-        var page = request.Page <= 0 ? 1 : request.Page;
-        var pageSize = request.PageSize <= 0 ? 20 : (request.PageSize > 100 ? 100 : request.PageSize);
+        var (page, pageSize) = PaginationConstants.Normalize(request.Page, request.PageSize);
 
         var query = _dbContext.Logs.AsNoTracking().AsQueryable();
 
@@ -82,7 +83,6 @@ public sealed class LogService : ILogService
         }
 
         var totalItems = await query.CountAsync(cancellationToken);
-        var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
         var items = await query
             .OrderByDescending(l => l.OccurredAt)
@@ -104,16 +104,15 @@ public sealed class LogService : ILogService
                 l.Payload))
             .ToListAsync(cancellationToken);
 
-        return new LogPageResponse(items, totalItems, page, pageSize, totalPages);
+        return new PagedData<LogEntryResponse>(items, PaginationMetadata.Create(page, pageSize, totalItems));
     }
 
-    public async Task<LogEntryResponse?> GetLogByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<LogEntryResponse> GetLogByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var log = await _dbContext.Logs
             .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
-
-        if (log == null) return null;
+            .FirstOrDefaultAsync(l => l.Id == id, cancellationToken)
+            ?? throw new EntityNotFoundException("LOG_NOT_FOUND", "LogEntry", id);
 
         return new LogEntryResponse(
             log.Id,
@@ -150,6 +149,11 @@ public sealed class LogService : ILogService
 
     public async Task<LogEventTypeResponse> SetEventTypeEnabledAsync(SetLogEventTypeEnabledRequest request, CancellationToken cancellationToken = default)
     {
+        if (request == null || string.IsNullOrWhiteSpace(request.Code))
+        {
+            throw new BusinessRuleValidationException("VAL_INVALID_INPUT", "Event type code is required.");
+        }
+
         var code = request.Code.Trim();
         var entity = await _dbContext.LogEventTypes
             .FirstOrDefaultAsync(e => e.Code == code, cancellationToken);

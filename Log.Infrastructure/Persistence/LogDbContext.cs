@@ -1,7 +1,7 @@
 namespace Log.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
-using global::Log.Application.Common.Interfaces;
+using global::Log.Application.Interfaces;
 using global::Log.Domain.Entities;
 
 public class LogDbContext : DbContext, IApplicationDbContext

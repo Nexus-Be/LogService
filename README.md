@@ -1,6 +1,6 @@
 # LOG SERVICE — ARCHITECTURE & FOLDER STRUCTURE GUIDE
 ## (CẨM NANG CẤU TRÚC THƯ MỤC & PHÁT TRIỂN DÀNH CHO DEVELOPER VÀ AI AGENT)
-> **Trạng thái triển khai (2026-10-24):** ⚠️ Một phần — gRPC **4/4 rpc** đã có (`LogGrpcService.cs`), OTel ✅, migration ✅; nhưng REST chỉ có **2 minimal endpoint** (`/health`, `/`) — **`POST /api/v1/log/batch` ❌ không tồn tại**; consumer `ILogEventOccurred` có nhưng **0 publisher** trên toàn hệ thống; **0/5 index** hứa trong `specs/04`; **0 test project** (4 project trong `Log.sln`).
+> **Trạng thái triển khai (2026-10-24):** ⚠️ Một phần — gRPC **4/4 rpc** đã có (`LogGrpcService.cs`), OTel ✅, migration ✅; nhưng REST chỉ có **2 minimal endpoint** (`/health`, `/`) — **`POST /api/v1/internal/logs/batch` ❌ không tồn tại**; consumer `ILogEventOccurred` có nhưng **0 publisher** trên toàn hệ thống; **0/5 index** hứa trong `specs/04`; **0 test project** (4 project trong `Log.sln`).
 > **Nguồn sự thật:** code trong repo này (`file:line` ghi kèm trong từng bảng).
 > **Cập nhật lần cuối:** 2026-10-24.
 > **Thông tin dịch vụ**:
@@ -8,7 +8,7 @@
 > - **Database**: PostgreSQL (`log_db`), Port máy host: `5436` (`docker-compose.yml:19`, `Log.Api/appsettings.json:10`).
 > - **Quy mô code**: 40 file `.cs` / 1.359 LOC (không tính `Migrations/`) — trong đó Application 9 file, Infrastructure 9, Domain 18, Api 4.
 > - **Nhiệm vụ chính (đã có)**: Lưu vết nhật ký tập trung (`LogEntry`), danh mục loại sự kiện (`LogEventType`), mô hình audit bảo mật (`CentralAuditLog`, `AuditSyncBatch`, `AppLogFileCatalog`, `SecurityAuditAlert`).
-> - **Nhiệm vụ đặc tả, CHƯA có code**: Thu thập nhật ký hàng loạt qua HTTP (`POST /api/v1/log/batch`) — ❌ xem mục 4.
+> - **Nhiệm vụ đặc tả, CHƯA có code**: Thu thập nhật ký hàng loạt qua HTTP (`POST /api/v1/internal/logs/batch`) — ❌ xem mục 4.
 ---
 ## 1. SƠ ĐỒ PHÂN TẦNG VÀ CẤU TRÚC THƯ MỤC CHUẨN
 ```
@@ -59,7 +59,7 @@ Bảng đối chiếu cấu trúc với code:
 | EF Configuration | 6 | `Log.Infrastructure/Persistence/Configurations/*.cs` | ✅ |
 | gRPC rpc | 4 | `LogGrpcService.cs:22,67,99,119` | ✅ |
 | REST endpoint | 2 | `Program.cs:66-67` | ✅ |
-| `POST /api/v1/log/batch` | 0 | không có `MapPost`, không có controller | ❌ |
+| `POST /api/v1/internal/logs/batch` | 0 | không có `MapPost`, không có controller | ❌ |
 ---
 ## 2. NGUYÊN TẮC BẤT BIẾN TẠI LOG SERVICE
 1. **APPEND-ONLY (CHỈ THÊM, KHÔNG SỬA/XÓA)**: Nhật ký hệ thống chỉ cho phép `INSERT` và `SELECT`. Tuyệt đối cấm viết API sửa đổi hoặc xóa bản ghi log. Code hiện tại đúng: không có rpc/endpoint nào `UPDATE`/`DELETE` `LogEntry` (`LogGrpcService.cs` chỉ có 4 rpc đọc + 1 rpc cấu hình `LogEventType`).
@@ -96,7 +96,7 @@ Application tự chạy `db.Database.Migrate()` lúc khởi động nếu DB qua
 ### 4.2. Đường ống log: hai đầu đều đứt
 | Đường | Kỳ vọng | Thực tế | Trạng thái |
 |---|---|---|---|
-| Gateway → `POST /api/v1/log/batch` | HTTP batch ingestion | `Log.Api` chỉ map `/health` và `/` (`Program.cs:66-67`); không có `MapPost`, 0 controller | ❌ 404 |
+| Gateway → `POST /api/v1/internal/logs/batch` | HTTP batch ingestion | `Log.Api` chỉ map `/health` và `/` (`Program.cs:66-67`); không có `MapPost`, 0 controller | ❌ 404 |
 | Service khác → `ILogEventOccurred` (RabbitMQ) | Event ingestion | `GlobalLogConsumer` đã đăng ký (`InfrastructureDependencyInjection.cs:34`), nhưng grep toàn hệ thống: **0 chỗ publish** `ILogEventOccurred` | ⚠️ consumer là code chết |
 Hệ quả: hiện **không có đường nào ghi được `LogEntry` mới** ngoài `LogSeedData` (seed)md` mục LG-01/LG-02.
 ### 4.3. Tên enum đã sửa

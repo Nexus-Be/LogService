@@ -1,6 +1,6 @@
 # 00 — NHIỆM VỤ CỐT LÕI & RÀO CHẮN CHỐNG ẢO GIÁC (LOG SERVICE)
 
-> **Trạng thái triển khai (2026-10-24):** ⚠️ Một phần — gRPC `4/4` rpc ✅, OpenTelemetry ✅, `9` bảng PostgreSQL ✅, migration `1/1` ✅; đường ghi log ❌ (`POST /api/v1/log/batch` không tồn tại, `GlobalLogConsumer` có `0` publisher), index hiệu năng `0/5` ❌, test project `0` ❌.
+> **Trạng thái triển khai (2026-10-24):** ⚠️ Một phần — gRPC `4/4` rpc ✅, OpenTelemetry ✅, `9` bảng PostgreSQL ✅, migration `1/1` ✅; đường ghi log ❌ (`POST /api/v1/internal/logs/batch` không tồn tại, `GlobalLogConsumer` có `0` publisher), index hiệu năng `0/5` ❌, test project `0` ❌.
 > **Nguồn sự thật:** code trong repo này (`Log.sln`, 4 project, 40 file `.cs` / 1359 dòng, không tính `Migrations/`).
 > **Cập nhật lần cuối:** 2026-10-24.
 
@@ -23,7 +23,7 @@
 | 2 | OpenTelemetry (traces / metrics / logs + OTLP exporter) | ✅ CÓ | `Log.Api/Extensions/ObservabilityExtensions.cs:8-25`; gọi tại `Log.Api/Program.cs:12`; endpoint OTLP `http://localhost:4317` (`Log.Api/appsettings.json:18-20`) |
 | 3 | Swagger / OpenAPI + gRPC reflection | ✅ CÓ | `Log.Api/Program.cs:37-41` (Swagger), `:23` `AddGrpcReflection`, `:41` `MapGrpcReflectionService` |
 | 4 | Nhật ký bất biến `LogEntry` (bảng `Logs`, `Payload` = `jsonb`) | ✅ CÓ | Entity `Log.Domain/Entities/LogEntry.cs`; cấu hình `Log.Infrastructure/Persistence/Configurations/LogEntryConfiguration.cs`; migration `Log.Infrastructure/Migrations/20261024103313_InitialLogSchema.cs` |
-| 5 | Đường **ghi** log (ghi từ xa vào `Logs`) | ❌ CHƯA CÓ | `Log.Api/Program.cs` chỉ map `GET /health` (`:66`) và `GET /` (`:67`) — **không** có `POST /api/v1/log/batch`, **không** có rpc ghi log, 0 controller. Xem `specs/02` §3 |
+| 5 | Đường **ghi** log (ghi từ xa vào `Logs`) | ❌ CHƯA CÓ | `Log.Api/Program.cs` chỉ map `GET /health` (`:66`) và `GET /` (`:67`) — **không** có `POST /api/v1/internal/logs/batch`, **không** có rpc ghi log, 0 controller. Xem `specs/02` §3 |
 | 6 | Consumer `ILogEventOccurred` (RabbitMQ) | ⚠️ MỘT PHẦN | Consumer có (`Log.Application/Consumers/GlobalLogConsumer.cs:10`, DI tại `Log.Infrastructure/InfrastructureDependencyInjection.cs:34`) nhưng **0 publisher** trong toàn bộ `src/` ⇒ hiện là dead code. Xem `specs/03` |
 | 7 | 5 index hiệu năng trên `Logs` | ❌ CHƯA CÓ (`0/5`) | `LogEntryConfiguration` không có `HasIndex`; migration có 8 `CreateIndex` nhưng không cái nào trên `Logs`. Xem `specs/04` §3 |
 | 8 | Test tự động | ❌ CHƯA CÓ | 0 test project trong `Log.sln`; CI `.github/workflows/ci-cd.yml` chỉ build/push Docker. Xem `specs/05` |
@@ -85,7 +85,7 @@ Khi viết tài liệu hoặc plan cho LogService, các phát biểu sau **đã 
 
 | Phát biểu SAI thường gặp | Sự thật |
 |--------------------------|---------|
-| "Có `POST /api/v1/log/batch` để ghi log hàng loạt" | ❌ Không tồn tại. Chỉ có `GET /health` và `GET /` (`Log.Api/Program.cs:66-67`) |
+| "Có `POST /api/v1/internal/logs/batch` để ghi log hàng loạt" | ❌ Không tồn tại. Chỉ có `GET /health` và `GET /` (`Log.Api/Program.cs:66-67`) |
 | "Có rpc ghi log (WriteLog / IngestLog)" | ❌ Không có. 4 rpc đều là đọc + cấu hình event type |
 | "`GlobalLogConsumer` đang ghi log từ các service khác" | ❌ 0 publisher cho `ILogEventOccurred` trong toàn bộ `src/` |
 | "Đã có 5 index hiệu năng trên `logs`" | ❌ `0/5` index trên bảng `Logs` |
