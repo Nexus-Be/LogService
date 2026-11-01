@@ -11,7 +11,7 @@
 * Examples: `LOG_NOT_FOUND`, `EVENT_TYPE_DISABLED`, `EVENT_TYPE_NOT_FOUND`, `VAL_INVALID_INPUT`, `UNAUTHORIZED`, `FORBIDDEN`.
 
 ## 3. RFC 9110 ProblemDetails Structure
-* Handled by `GlobalExceptionHandlerMiddleware.cs`: returns `application/problem+json` containing `type`, `title`, `status`, `errorCode`, `detail`, `traceId`.
+* Handled by `GlobalExceptionHandlerMiddleware.cs` and `ApiValidationProblemFactory.cs`: returns `application/problem+json` containing `type`, `title`, `status`, `errorCode`, `detail`, `errors` (field validation dictionary), `traceId`, and `timestamp`.
 
 ## 4. Enum Persistence & Boundary Serialization
 * In PostgreSQL (`log_db`): 100% stored as `integer` (int32). Prohibit `HasConversion<string>()`.
