@@ -22,6 +22,7 @@ description: Add or modify outbound typed REST clients in LogService (port 8004)
 2. **Strict Project Isolation:** Never reference external assemblies or query other microservice databases directly.
 3. **No Internal API Key:** Inter-service routes use standard public endpoints. Do not send `X-Internal-Service-Key`.
 4. **Append-Only Isolation:** Sending outbound alerts must never interfere with the local `Logs` append-only database transaction.
+5. **W3C Distributed Tracing:** Transmit `traceparent` downstream when dispatching security alerts to NotificationService so the incident trace links directly to the root audit event in Tempo.
 
 ## Implementation Steps
 
