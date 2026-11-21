@@ -44,6 +44,18 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "log-service" }));
+app.MapGet("/health", async (LogDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        return await db.Database.CanConnectAsync(ct)
+            ? Results.Ok(new { status = "Healthy", service = "log-service" })
+            : Results.Json(new { status = "Unhealthy", service = "log-service", message = "The database is not reachable." }, statusCode: 503);
+    }
+    catch (Exception)
+    {
+        return Results.Json(new { status = "Unhealthy", service = "log-service", message = "The database check failed." }, statusCode: 503);
+    }
+});
 
 app.Run();

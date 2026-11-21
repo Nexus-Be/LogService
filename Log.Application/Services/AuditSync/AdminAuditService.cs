@@ -30,7 +30,9 @@ public sealed record AlertFilter(int Page, int PageSize, string? Status, string?
 
 public sealed record UpdateSecurityAlertRequest(string Status, string? Note);
 
-public sealed record ServiceHealthResponse(string ServiceName, string Status, long LatencyMs, DateTimeOffset CheckedAt, string? Message);
+public sealed record WorkerHealthResponse(string Name, string Status);
+
+public sealed record ServiceHealthResponse(string ServiceName, string Status, long LatencyMs, DateTimeOffset CheckedAt, string? Message, IReadOnlyList<WorkerHealthResponse>? Workers = null);
 
 public sealed record SystemHealthResponse(string Status, DateTimeOffset CheckedAt, IReadOnlyList<ServiceHealthResponse> Services);
 

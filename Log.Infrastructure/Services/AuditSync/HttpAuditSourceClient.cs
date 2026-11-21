@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using global::Log.Application.Services.AuditSync;
 
 /// <summary>Reads audit records from the source services' internal routes, with the shared internal service key.</summary>
@@ -16,12 +17,14 @@ public sealed class HttpAuditSourceClient : IAuditSourceClient, IHealthProbe
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private readonly IHttpClientFactory _factory;
+    private readonly IServiceProvider _scopes;
     private readonly string _key;
     private readonly Dictionary<string, string> _urls;
 
-    public HttpAuditSourceClient(IHttpClientFactory factory, IConfiguration configuration)
+    public HttpAuditSourceClient(IHttpClientFactory factory, IServiceProvider scopes, IConfiguration configuration)
     {
         _factory = factory;
+        _scopes = scopes;
         _key = Environment.GetEnvironmentVariable("INTERNAL_SERVICE_SECRET")
             ?? configuration["INTERNAL_SERVICE_SECRET"]
             ?? configuration["InternalSecurity:ServiceKey"]
@@ -82,8 +85,18 @@ public sealed class HttpAuditSourceClient : IAuditSourceClient, IHealthProbe
         var started = DateTimeOffset.UtcNow;
         if (service == "log-service")
         {
-            // This service is answering, which is the check; the database is checked by the caller's own query path.
-            return new ServiceHealthResponse(service, "Healthy", 0, started, null);
+            try
+            {
+                using var scope = _scopes.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<global::Log.Infrastructure.Persistence.LogDbContext>();
+                var ok = await db.Database.CanConnectAsync(ct);
+                var ms = (long)(DateTimeOffset.UtcNow - started).TotalMilliseconds;
+                return new ServiceHealthResponse(service, ok ? "Healthy" : "Unhealthy", ms, started, ok ? null : "The database is not reachable.");
+            }
+            catch (Exception ex)
+            {
+                return new ServiceHealthResponse(service, "Unhealthy", 0, started, ex.Message);
+            }
         }
 
         try
@@ -91,16 +104,36 @@ public sealed class HttpAuditSourceClient : IAuditSourceClient, IHealthProbe
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
             timeout.CancelAfter(TimeSpan.FromSeconds(3));
             var client = _factory.CreateClient("audit-source");
-            using var response = await client.GetAsync($"{_urls[service]}/health", timeout.Token);
+            // Notification answers /health with "the process is up" only; its /health/ready also checks the database and its workers.
+            var path = service == "notification-service" ? "/health/ready" : "/health";
+            using var response = await client.GetAsync($"{_urls[service]}{path}", timeout.Token);
             var latency = (long)(DateTimeOffset.UtcNow - started).TotalMilliseconds;
-            if (!response.IsSuccessStatusCode)
+            var body = await response.Content.ReadAsStringAsync(timeout.Token);
+
+            IReadOnlyList<WorkerHealthResponse>? workers = null;
+            string? detail = null;
+            if (service == "notification-service")
             {
-                return new ServiceHealthResponse(service, "Unhealthy", latency, started, $"Health check answered {(int)response.StatusCode}.");
+                try
+                {
+                    using var doc = JsonDocument.Parse(body);
+                    var root = doc.RootElement;
+                    string Read(string name) => root.TryGetProperty(name, out var v) ? v.GetString() ?? string.Empty : string.Empty;
+                    workers = new[] { new WorkerHealthResponse("database", Read("database")), new WorkerHealthResponse("workers", Read("workers")) };
+                    if (!response.IsSuccessStatusCode) detail = $"Database {Read("database")}, workers {Read("workers")}.";
+                }
+                catch (JsonException)
+                {
+                }
             }
 
-            var body = await response.Content.ReadAsStringAsync(timeout.Token);
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ServiceHealthResponse(service, "Unhealthy", latency, started, detail ?? $"Health check answered {(int)response.StatusCode}.", workers);
+            }
+
             var degraded = body.Contains("Degraded", StringComparison.OrdinalIgnoreCase);
-            return new ServiceHealthResponse(service, degraded ? "Degraded" : "Healthy", latency, started, null);
+            return new ServiceHealthResponse(service, degraded ? "Degraded" : "Healthy", latency, started, null, workers);
         }
         catch (Exception ex)
         {
