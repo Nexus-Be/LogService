@@ -104,41 +104,79 @@ public sealed class HttpAuditSourceClient : IAuditSourceClient, IHealthProbe
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
             timeout.CancelAfter(TimeSpan.FromSeconds(3));
             var client = _factory.CreateClient("audit-source");
-            // Notification answers /health with "the process is up" only; its /health/ready also checks the database and its workers.
-            var path = service == "notification-service" ? "/health/ready" : "/health";
-            using var response = await client.GetAsync($"{_urls[service]}{path}", timeout.Token);
-            var latency = (long)(DateTimeOffset.UtcNow - started).TotalMilliseconds;
-            var body = await response.Content.ReadAsStringAsync(timeout.Token);
-
-            IReadOnlyList<WorkerHealthResponse>? workers = null;
-            string? detail = null;
+            // Notification answers /health with "the process is up" only. Its internal route lists the database and every worker.
             if (service == "notification-service")
             {
-                try
-                {
-                    using var doc = JsonDocument.Parse(body);
-                    var root = doc.RootElement;
-                    string Read(string name) => root.TryGetProperty(name, out var v) ? v.GetString() ?? string.Empty : string.Empty;
-                    workers = new[] { new WorkerHealthResponse("database", Read("database")), new WorkerHealthResponse("workers", Read("workers")) };
-                    if (!response.IsSuccessStatusCode) detail = $"Database {Read("database")}, workers {Read("workers")}.";
-                }
-                catch (JsonException)
-                {
-                }
+                return await CheckNotificationAsync(started, timeout.Token);
             }
 
+            using var response = await client.GetAsync($"{_urls[service]}/health", timeout.Token);
+            var latency = (long)(DateTimeOffset.UtcNow - started).TotalMilliseconds;
+            var body = await response.Content.ReadAsStringAsync(timeout.Token);
             if (!response.IsSuccessStatusCode)
             {
-                return new ServiceHealthResponse(service, "Unhealthy", latency, started, detail ?? $"Health check answered {(int)response.StatusCode}.", workers);
+                return new ServiceHealthResponse(service, "Unhealthy", latency, started, $"Health check answered {(int)response.StatusCode}.");
             }
 
             var degraded = body.Contains("Degraded", StringComparison.OrdinalIgnoreCase);
-            return new ServiceHealthResponse(service, degraded ? "Degraded" : "Healthy", latency, started, null, workers);
+            return new ServiceHealthResponse(service, degraded ? "Degraded" : "Healthy", latency, started, null);
         }
         catch (Exception ex)
         {
             var latency = (long)(DateTimeOffset.UtcNow - started).TotalMilliseconds;
             return new ServiceHealthResponse(service, "Unhealthy", latency, started, ex is OperationCanceledException ? "The service did not answer in time." : ex.Message);
         }
+    }
+
+    private static bool Find(JsonElement element, string name, out JsonElement value)
+    {
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in element.EnumerateObject())
+            {
+                if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase)) { value = property.Value; return true; }
+            }
+        }
+
+        value = default;
+        return false;
+    }
+
+    private async Task<ServiceHealthResponse> CheckNotificationAsync(DateTimeOffset started, CancellationToken ct)
+    {
+        const string service = "notification-service";
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"{_urls[service]}/api/v1/internal/health/workers");
+        request.Headers.Add("X-Internal-Service-Key", _key);
+        var client = _factory.CreateClient("audit-source");
+        using var response = await client.SendAsync(request, ct);
+        var latency = (long)(DateTimeOffset.UtcNow - started).TotalMilliseconds;
+        if (!response.IsSuccessStatusCode)
+        {
+            return new ServiceHealthResponse(service, "Unhealthy", latency, started, $"Health check answered {(int)response.StatusCode}.");
+        }
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct));
+        var root = doc.RootElement;
+        var workers = new List<WorkerHealthResponse>();
+        if (Find(root, "database", out var database) && Find(database, "status", out var dbStatus))
+        {
+            workers.Add(new WorkerHealthResponse("database", dbStatus.GetString() ?? "Unknown"));
+        }
+
+        if (Find(root, "workers", out var list) && list.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var worker in list.EnumerateArray())
+            {
+                var name = Find(worker, "name", out var n) ? n.GetString() ?? "worker" : "worker";
+                var status = Find(worker, "status", out var s) ? s.GetString() ?? "Unknown" : "Unknown";
+                workers.Add(new WorkerHealthResponse(name, status));
+            }
+        }
+
+        var overall = Find(root, "status", out var st) ? st.GetString() : null;
+        var healthy = string.Equals(overall, "Healthy", StringComparison.OrdinalIgnoreCase);
+        var broken = workers.Where(w => w.Status is not ("Running" or "Waiting" or "Disabled" or "Healthy")).Select(w => w.Name).ToList();
+        return new ServiceHealthResponse(service, healthy ? "Healthy" : "Unhealthy", latency, started,
+            healthy ? null : $"Not ready: {(broken.Count > 0 ? string.Join(", ", broken) : "see workers")}.", workers);
     }
 }
