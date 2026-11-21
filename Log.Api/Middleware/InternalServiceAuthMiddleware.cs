@@ -30,7 +30,17 @@ public sealed class InternalServiceAuthMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (context.Request.Path.StartsWithSegments("/api/v1/internal", StringComparison.OrdinalIgnoreCase))
+        // The batch ingestion route is for services only, so it needs the internal key like /api/v1/internal does (A1).
+        var isBatchIngest = context.Request.Path.Equals("/api/v1/logs/batch", StringComparison.OrdinalIgnoreCase);
+        if (isBatchIngest && !context.Request.Headers.ContainsKey(HeaderKeyInternalService))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync("{\"errorCode\":\"UNAUTHORIZED\",\"message\":\"Authentication is required to access this resource.\"}");
+            return;
+        }
+
+        if (isBatchIngest || context.Request.Path.StartsWithSegments("/api/v1/internal", StringComparison.OrdinalIgnoreCase))
         {
             var expectedKey = Environment.GetEnvironmentVariable("INTERNAL_SERVICE_SECRET")
                 ?? _configuration["INTERNAL_SERVICE_SECRET"]

@@ -34,6 +34,13 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<LogDbContext>());
 
+        services.Configure<global::Log.Application.Services.AuditSync.AuditSyncOptions>(configuration.GetSection("AuditSync"));
+        services.AddHttpClient("audit-source", c => c.Timeout = TimeSpan.FromSeconds(10));
+        services.AddSingleton<Services.AuditSync.HttpAuditSourceClient>();
+        services.AddSingleton<global::Log.Application.Services.AuditSync.IAuditSourceClient>(sp => sp.GetRequiredService<Services.AuditSync.HttpAuditSourceClient>());
+        services.AddSingleton<global::Log.Application.Services.AuditSync.IHealthProbe>(sp => sp.GetRequiredService<Services.AuditSync.HttpAuditSourceClient>());
+        services.AddHostedService<Services.AuditSync.AuditSyncWorker>();
+
         // Identity propagation delegating handler for outgoing inter-service HTTP requests
         services.AddTransient<Services.Common.IdentityPropagationHandler>();
 

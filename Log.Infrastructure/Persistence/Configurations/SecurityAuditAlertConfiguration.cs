@@ -13,6 +13,7 @@ public class SecurityAuditAlertConfiguration : IEntityTypeConfiguration<Security
         builder.Property(x => x.ServiceName).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(2000);
         builder.Property(x => x.ResolutionNote).HasMaxLength(2000);
+        builder.HasIndex(x => new { x.CentralAuditLogId, x.TriggeredRule }).IsUnique();
 
         builder.HasOne(a => a.CentralAuditLog)
             .WithMany(c => c.SecurityAlerts)

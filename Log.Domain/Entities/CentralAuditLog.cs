@@ -17,6 +17,10 @@ public class CentralAuditLog : BaseEntity<Guid>
     public string? ChangedColumns { get; set; }
     public string? IpAddress { get; set; }
     public string? UserAgent { get; set; }
+    /// <summary>The id of the record in the service it came from; with ServiceName it makes the sync idempotent.</summary>
+    public Guid? SourceRecordId { get; set; }
+    /// <summary>The action name as the source service spells it (for example BalanceAdjustment).</summary>
+    public string? ActionName { get; set; }
     public DateTimeOffset SyncedAt { get; set; } = DateTimeOffset.UtcNow;
 
     // Navigation
