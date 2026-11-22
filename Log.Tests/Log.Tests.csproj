@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Log.Domain\Log.Domain.csproj" />
     <ProjectReference Include="..\Log.Application\Log.Application.csproj" />
+    <ProjectReference Include="..\Log.Api\Log.Api.csproj" />
   </ItemGroup>
 
 </Project>
