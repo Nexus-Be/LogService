@@ -20,6 +20,9 @@ public class CentralAuditLogConfiguration : IEntityTypeConfiguration<CentralAudi
         builder.Property(x => x.ChangedColumns).HasColumnType("jsonb");
         builder.Property(x => x.IpAddress).HasMaxLength(50);
         builder.Property(x => x.UserAgent).HasMaxLength(500);
+        builder.Property(x => x.ActionName).HasMaxLength(100);
+        builder.HasIndex(x => new { x.ServiceName, x.SourceRecordId }).IsUnique().HasFilter("\"SourceRecordId\" IS NOT NULL");
+        builder.HasIndex(x => x.CreatedAt);
 
         builder.HasMany(c => c.SecurityAlerts)
             .WithOne(a => a.CentralAuditLog)

@@ -11,5 +11,4 @@ public interface ILogService
     Task<LogEntryResponse> GetLogByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<LogEventTypeListResponse> ListEventTypesAsync(CancellationToken cancellationToken = default);
     Task<LogEventTypeResponse> SetEventTypeEnabledAsync(SetLogEventTypeEnabledRequest request, CancellationToken cancellationToken = default);
-    Task IngestBatchAsync(object payload, CancellationToken cancellationToken = default);
 }

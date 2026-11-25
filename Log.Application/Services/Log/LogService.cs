@@ -177,10 +177,4 @@ public sealed class LogService : ILogService
             entity.IsEnabled,
             entity.UpdatedAt);
     }
-
-    public Task IngestBatchAsync(object payload, CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Batch log ingested successfully");
-        return Task.CompletedTask;
-    }
 }
